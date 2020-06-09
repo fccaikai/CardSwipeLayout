@@ -8,7 +8,7 @@ public final class CardConfig {
     /**
      * 显示可见的卡片数量
      */
-    public static final int DEFAULT_SHOW_ITEM = 3;
+    public static final int DEFAULT_SHOW_ITEM = 2;
     /**
      * 默认缩放的比例
      */
@@ -16,7 +16,7 @@ public final class CardConfig {
     /**
      * 卡片Y轴偏移量时按照14等分计算
      */
-    public static final int DEFAULT_TRANSLATE_Y = 14;
+    public static final int DEFAULT_TRANSLATE_Y = 13;
     /**
      * 卡片滑动时默认倾斜的角度
      */

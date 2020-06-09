@@ -1,9 +1,10 @@
 package me.yuqirong.cardswipelayout;
 
-import android.support.annotation.NonNull;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.NonNull;
+import androidx.core.view.MotionEventCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
+
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,11 +55,11 @@ public class CardLayoutManager extends RecyclerView.LayoutManager {
                 if (position == CardConfig.DEFAULT_SHOW_ITEM) {
                     view.setScaleX(1 - (position - 1) * CardConfig.DEFAULT_SCALE);
                     view.setScaleY(1 - (position - 1) * CardConfig.DEFAULT_SCALE);
-                    view.setTranslationY((position - 1) * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
+                    view.setTranslationY(-(position - 1) * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
                 } else if (position > 0) {
                     view.setScaleX(1 - position * CardConfig.DEFAULT_SCALE);
                     view.setScaleY(1 - position * CardConfig.DEFAULT_SCALE);
-                    view.setTranslationY(position * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
+                    view.setTranslationY(-position * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
                 } else {
                     view.setOnTouchListener(mOnTouchListener);
                 }
@@ -79,7 +80,7 @@ public class CardLayoutManager extends RecyclerView.LayoutManager {
                 if (position > 0) {
                     view.setScaleX(1 - position * CardConfig.DEFAULT_SCALE);
                     view.setScaleY(1 - position * CardConfig.DEFAULT_SCALE);
-                    view.setTranslationY(position * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
+                    view.setTranslationY(-position * view.getMeasuredHeight() / CardConfig.DEFAULT_TRANSLATE_Y);
                 } else {
                     view.setOnTouchListener(mOnTouchListener);
                 }
@@ -87,15 +88,37 @@ public class CardLayoutManager extends RecyclerView.LayoutManager {
         }
     }
 
+    private float startX, startY;
+
     private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             RecyclerView.ViewHolder childViewHolder = mRecyclerView.getChildViewHolder(v);
-            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-                mItemTouchHelper.startSwipe(childViewHolder);
+            switch (MotionEventCompat.getActionMasked(event)) {
+                case MotionEvent.ACTION_DOWN:
+                    startX = event.getX();
+                    startY = event.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float x = event.getX();
+                    float y = event.getY();
+
+                    if (Math.abs(y - startY) < Math.abs(x - startX) && Math.abs(x - startX) > 40) {
+                        //上下滑动
+                        if (mItemTouchHelper != null) {
+                            mItemTouchHelper.startSwipe(childViewHolder);
+                        }
+                    }else
+                        return false;
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    startX = 0;
+                    startY = 0;
+                    break;
             }
-            return false;
+            return true;
         }
     };
 
